@@ -8,11 +8,13 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 char word[SHA512_DIGEST_LENGTH];
 const char *hash_file;
 
-void * threadAFunc(){
+void * threadAFunc(void *arg){
   printf("\nThread1 with tid %lu\n", (unsigned long)pthread_self());
 
   printf("\tPlease enter your password: > ");
@@ -21,7 +23,7 @@ void * threadAFunc(){
   return NULL;
 }
 
-void * threadBFunc(){
+void * threadBFunc(void *arg){
 
   printf("\nThread2 with tid %lu\n", (unsigned long)pthread_self());
 
