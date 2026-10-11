@@ -5,31 +5,57 @@
 #include <string.h>
 #include <openssl/sha.h> // Include for SHA512 functions
 
-int main() {
-    const char *string_to_hash = "cactus";
+int main(int argc, char *argv[]) {
+
+    if (argc < 3){
+      printf("Invalid usage: ./hash512 dictionary_file hash_file");
+      return 1;
+    }
+
+    char *dict_file = argv[1];
+    char *hash_file = argv[2];
+
+    FILE *dfile = fopen(dict_file, "r");
+    FILE *hfile = fopen(hash_file, "a+");
+
     unsigned char digest[SHA512_DIGEST_LENGTH];
+    char word[100];
+
+    while (fscanf(dfile, "%99s", word) != EOF){
+      SHA512((const unsigned char *)word,
+                strlen(word), digest);
+
+      /*printf("Length of the hash: %d\n", SHA512_DIGEST_LENGTH);
+      printf("SHA512 hash of \"%s\": ", word);
+      for (int i = 0; i < SHA512_DIGEST_LENGTH; i++) {
+          printf("%02x", digest[i]);
+      }
+      printf("\n");*/
+
+      fprintf(hfile, "%s ", word);
+      for (int i = 0; i < SHA512_DIGEST_LENGTH; i++) {
+          fprintf(hfile, "%02x", digest[i]);
+      }
+      fprintf(hfile, "\n");
+
+      }
+
     // this is a macro defined in the header file
     // in  /usr/include/openssl/sha.h circa line 85.
     // Open that file and check it out.
     // the terms digest and hash value are synonyms
 
     // Calculate the SHA512 hash
-    SHA512((const unsigned char *)string_to_hash,
-                strlen(string_to_hash), digest);
 
     // Print the hash in hex format, every byte as 2 hex digits
     // so you will see 128 characters printed, 64*2
 
-    printf("Length of the hash: %d\n", SHA512_DIGEST_LENGTH);
-    printf("SHA512 hash of \"%s\": ", string_to_hash);
-    for (int i = 0; i < SHA512_DIGEST_LENGTH; i++) {
-        printf("%02x", digest[i]);
-    }
-    printf("\n");
 
 
-    printf("Hash file was successfully created.");
+    printf("Hash file was successfully created.\n");
 
+    fclose(dfile);
+    fclose(hfile);
     return 0;
 }
 /*
